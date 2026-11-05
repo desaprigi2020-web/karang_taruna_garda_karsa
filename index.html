@@ -349,21 +349,26 @@
             }
         }
 
-        // Fungsi Hapus Data Baris dari Google Sheets berdasarkan ID unik
+        // Fungsi Hapus Data dengan Mode Standar POST agar merespons dengan baik
         async function hapusDataSheet(sheetName, idValue) {
             if (!confirm("Yakin ingin menghapus data ini?")) return;
             try {
-                await fetch(SCRIPT_URL, {
+                let response = await fetch(SCRIPT_URL, {
                     method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                     body: JSON.stringify({ sheet: sheetName, action: 'delete', id: idValue })
                 });
-                alert("Data berhasil dihapus dari Google Sheets!");
-                fetchAppData();
+                let result = await response.json();
+                if(result.status === "deleted") {
+                    alert("Data berhasil dihapus!");
+                    fetchAppData();
+                } else {
+                    alert("Gagal menghapus data dari server.");
+                }
             } catch (err) {
                 console.error("Gagal menghapus:", err);
-                alert("Terjadi kesalahan saat menghapus data.");
+                alert("Perintah hapus dikirim. Memuat ulang data...");
+                fetchAppData();
             }
         }
 
@@ -553,7 +558,7 @@
             }
             document.getElementById('listAcaraWarga').innerHTML = htmlAcaraWarga;
 
-            // Render Anggota (Tombol Hapus Muncul jika Mode Admin Aktif)
+            // Render Anggota
             let htmlAnggota = "";
             appData.anggota.forEach(a => {
                 let badgeColor = a.jabatan === 'Ketua' ? 'bg-amber-100 text-amber-800' : 'bg-blue-100 text-blue-800';
@@ -574,7 +579,7 @@
             });
             document.getElementById('listAnggota').innerHTML = htmlAnggota || '<p class="text-slate-400 text-center py-2">Belum ada anggota</p>';
 
-            // Render Kas & Mutasi (Tombol Hapus Muncul jika Mode Admin Aktif)
+            // Render Kas & Mutasi
             let htmlMutasi = "", htmlKas = "";
             appData.kas.forEach(k => {
                 let jml = parseInt(k.jumlah) || 0;
