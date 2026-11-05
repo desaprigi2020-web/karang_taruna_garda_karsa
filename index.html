@@ -94,7 +94,7 @@
                         <i data-lucide="calendar" class="w-4 h-4 text-blue-600"></i> Agenda & Acara Mendatang
                     </h3>
                     <div id="listAcaraWarga" class="space-y-2.5 text-xs">
-                        <!-- Data Acara dimuat lewat JS -->
+                        <p class="text-slate-400 text-center py-2">Memuat data dari server...</p>
                     </div>
                 </section>
 
@@ -106,7 +106,7 @@
                         </h3>
                     </div>
                     <div id="listMutasi" class="space-y-2 text-xs divide-y divide-slate-100">
-                        <!-- Data dimuat lewat JS -->
+                        <p class="text-slate-400 text-center py-2">Memuat data...</p>
                     </div>
                 </section>
             </div>
@@ -126,7 +126,7 @@
                         </div>
                     </div>
                     <div id="listAnggota" class="space-y-2 text-xs">
-                        <!-- Data Anggota -->
+                        <p class="text-slate-400 text-center py-2">Memuat anggota...</p>
                     </div>
                 </section>
             </div>
@@ -146,7 +146,7 @@
                         </div>
                     </div>
                     <div id="listSemuaKas" class="space-y-2 text-xs divide-y divide-slate-100">
-                        <!-- Data Kas -->
+                        <p class="text-slate-400 text-center py-2">Memuat kas...</p>
                     </div>
                 </section>
             </div>
@@ -178,7 +178,7 @@
                         </button>
                     </div>
                     <div id="listAdminAcara" class="space-y-2 text-xs pt-1">
-                        <!-- Daftar Acara untuk Admin hapus/kelola -->
+                        <!-- Daftar Acara untuk Admin -->
                     </div>
                 </section>
 
@@ -311,31 +311,22 @@
         </div>
     </nav>
 
-    <!-- SCRIPT APLIKASI -->
+    <!-- SCRIPT APLIKASI TERHUBUNG GOOGLE SHEETS -->
     <script>
-        // Data Utama & Pengaturan Organisasi
-        let appData = JSON.parse(localStorage.getItem('karangtaruna_data_laruiz_v2')) || {
+        // URL Web App Google Sheets Anda
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwFcMQTM20tHZF8MEWs64APJfqGJbvVM907yPSzIdy0nIK7jHN5psunch53rXCy8ENY/exec";
+
+        let appData = {
             orgName: "Karang Taruna",
             orgSub: "Desa Prigi • Portal Warga & Pengurus",
             adminPin: "1234",
-            acara: [
-                { id: 1, nama: "Rapat Rutin Bulanan", waktu: "Minggu, 15 Nov 2026 • 19:30 WIB", tempat: "Balai Desa Prigi" }
-            ],
-            kas: [
-                { id: 1, ket: "Iuran Wajib Rapat Bulanan", tanggal: "2026-11-01", jumlah: 10000, tipe: "masuk", pembayar: "Budi Santoso" },
-                { id: 2, ket: "Konsumsi Rapat Pengurus", tanggal: "2026-11-02", jumlah: 45000, tipe: "keluar", pembayar: "-" }
-            ],
-            anggota: [
-                { id: 1, nama: "Nur Kholis", jabatan: "Ketua", rt: "RT 01" },
-                { id: 2, nama: "Joko Widodo", jabatan: "Bendahara", rt: "RT 03" },
-                { id: 3, nama: "Siti Aminah", jabatan: "Sekretaris", rt: "RT 02" },
-                { id: 4, nama: "Budi Santoso", jabatan: "Anggota", rt: "RT 02" }
-            ]
+            acara: [],
+            kas: [],
+            anggota: []
         };
 
         let isAdmin = false;
 
-        // Urutan prioritas jabatan untuk sorting otomatis
         const jabatanPrioritas = {
             "Ketua": 1,
             "Wakil Ketua": 2,
@@ -346,9 +337,38 @@
             "Lain-lain": 7
         };
 
-        function saveData() {
-            localStorage.setItem('karangtaruna_data_laruiz_v2', JSON.stringify(appData));
-            renderApp();
+        // Ambil Data dari Google Sheets saat aplikasi pertama dibuka
+        async function fetchAppData() {
+            try {
+                let response = await fetch(SCRIPT_URL + "?action=getData");
+                let result = await response.json();
+                if(result) {
+                    appData.anggota = result.anggota || [];
+                    appData.kas = result.kas || [];
+                    appData.acara = result.acara || [];
+                    renderApp();
+                }
+            } catch (err) {
+                console.error("Gagal memuat data:", err);
+            }
+        }
+
+        // Kirim Data Baru ke Google Sheets
+        async function saveDataToSheet(sheetName, rowData, callback) {
+            try {
+                await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ sheet: sheetName, data: rowData })
+                });
+                alert("Data berhasil disimpan ke Cloud Google Sheets!");
+                if(callback) callback();
+                fetchAppData(); // Refresh data terbaru
+            } catch (err) {
+                console.error("Gagal menyimpan:", err);
+                alert("Terjadi kesalahan saat menyimpan data.");
+            }
         }
 
         // Ganti Tab Tampilan
@@ -414,30 +434,6 @@
             }
         }
 
-        // Hapus Anggota
-        function hapusAnggota(id) {
-            if (confirm("Yakin ingin menghapus anggota ini dari struktur?")) {
-                appData.anggota = appData.anggota.filter(a => a.id !== id);
-                saveData();
-            }
-        }
-
-        // Hapus Transaksi Kas
-        function hapusKas(id) {
-            if (confirm("Yakin ingin menghapus catatan transaksi ini?")) {
-                appData.kas = appData.kas.filter(k => k.id !== id);
-                saveData();
-            }
-        }
-
-        // Hapus Acara
-        function hapusAcara(id) {
-            if (confirm("Yakin ingin menghapus agenda acara ini?")) {
-                appData.acara = appData.acara.filter(ac => ac.id !== id);
-                saveData();
-            }
-        }
-
         // Modal Anggota
         function bukaModalAnggota() {
             document.getElementById('modalAnggota').classList.remove('hidden');
@@ -451,11 +447,12 @@
             let rt = document.getElementById('addRt').value.trim();
 
             if (nama) {
-                appData.anggota.push({ id: Date.now(), nama, jabatan, rt: rt || "RT 01" });
-                document.getElementById('addNama').value = "";
-                document.getElementById('addRt').value = "";
+                let id = Date.now();
                 tutupModalAnggota();
-                saveData();
+                saveDataToSheet('Anggota', [id, nama, jabatan, rt || "RT 01"], () => {
+                    document.getElementById('addNama').value = "";
+                    document.getElementById('addRt').value = "";
+                });
             } else {
                 alert("Nama anggota wajib diisi!");
             }
@@ -474,12 +471,13 @@
             let tempat = document.getElementById('acaraTempat').value.trim();
 
             if (nama && waktu && tempat) {
-                appData.acara.push({ id: Date.now(), nama, waktu, tempat });
-                document.getElementById('acaraNama').value = "";
-                document.getElementById('acaraWaktu').value = "";
-                document.getElementById('acaraTempat').value = "";
+                let id = Date.now();
                 tutupModalAcara();
-                saveData();
+                saveDataToSheet('Acara', [id, nama, waktu, tempat], () => {
+                    document.getElementById('acaraNama').value = "";
+                    document.getElementById('acaraWaktu').value = "";
+                    document.getElementById('acaraTempat').value = "";
+                });
             } else {
                 alert("Semua kolom acara wajib diisi!");
             }
@@ -519,11 +517,12 @@
             let pembayar = (tipe === 'masuk') ? document.getElementById('kasAnggota').value : "-";
 
             if (ket && !isNaN(jumlah) && tanggal) {
-                appData.kas.unshift({ id: Date.now(), ket, tanggal, jumlah, tipe, pembayar });
-                document.getElementById('kasKet').value = "";
-                document.getElementById('kasJumlah').value = "";
+                let id = Date.now();
                 tutupModalKas();
-                saveData();
+                saveDataToSheet('Kas', [id, ket, tanggal, jumlah, tipe, pembayar], () => {
+                    document.getElementById('kasKet').value = "";
+                    document.getElementById('kasJumlah').value = "";
+                });
             } else {
                 alert("Mohon isi keterangan, tanggal, dan nominal dengan benar!");
             }
@@ -537,8 +536,8 @@
             if(namaBaru) {
                 appData.orgName = namaBaru;
                 appData.orgSub = subBaru || "Portal Resmi Warga";
-                saveData();
-                alert("Pengaturan organisasi berhasil diperbarui!");
+                renderApp();
+                alert("Pengaturan organisasi diperbarui!");
             } else {
                 alert("Nama organisasi tidak boleh kosong!");
             }
@@ -550,14 +549,13 @@
             if(pinBaru.length >= 3) {
                 appData.adminPin = pinBaru;
                 document.getElementById('inputPinBaru').value = "";
-                saveData();
-                alert("PIN Admin berhasil diubah! Gunakan PIN baru ini untuk login selanjutnya.");
+                alert("PIN Admin berhasil diubah!");
             } else {
                 alert("PIN minimal harus 3 karakter/angka!");
             }
         }
 
-        // Render Seluruh Tampilan & Urutan Jabatan
+        // Render Seluruh Tampilan
         function renderApp() {
             document.getElementById('headerNamaOrg').innerText = appData.orgName;
             document.getElementById('headerSubOrg').innerText = appData.orgSub;
@@ -567,8 +565,9 @@
 
             let totalMasuk = 0, totalKeluar = 0;
             appData.kas.forEach(k => {
-                if(k.tipe === 'masuk') totalMasuk += k.jumlah;
-                else totalKeluar += k.jumlah;
+                let jml = parseInt(k.jumlah) || 0;
+                if(k.tipe === 'masuk') totalMasuk += jml;
+                else totalKeluar += jml;
             });
             let saldo = totalMasuk - totalKeluar;
 
@@ -583,7 +582,7 @@
                 return prioritasA - prioritasB;
             });
 
-            // Render Agenda / Acara untuk Warga di Beranda
+            // Render Agenda / Acara
             let htmlAcaraWarga = "";
             let htmlAdminAcara = "";
             if(appData.acara && appData.acara.length > 0) {
@@ -601,7 +600,6 @@
                                 <p class="font-semibold text-slate-800">${ac.nama}</p>
                                 <p class="text-[10px] text-slate-500">${ac.waktu}</p>
                             </div>
-                            <button onclick="hapusAcara(${ac.id})" class="text-rose-500 hover:text-rose-700 p-1" title="Hapus Acara"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                         </div>
                     `;
                 });
@@ -616,30 +614,26 @@
             let htmlAnggota = "";
             appData.anggota.forEach(a => {
                 let badgeColor = a.jabatan === 'Ketua' ? 'bg-amber-100 text-amber-800' : (a.jabatan === 'Bendahara' || a.jabatan === 'Sekretaris' ? 'bg-indigo-100 text-indigo-800' : 'bg-blue-100 text-blue-800');
-                let deleteButton = isAdmin ? `<button onclick="hapusAnggota(${a.id})" class="text-rose-500 hover:text-rose-700 p-1.5 transition" title="Hapus Anggota"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : '';
-                
                 htmlAnggota += `
                     <div class="flex justify-between items-center p-3 bg-slate-50 rounded-lg border border-slate-100">
                         <div>
                             <p class="font-semibold text-slate-800">${a.nama}</p>
                             <p class="text-[10px] text-slate-500">${a.rt} • <span class="font-medium text-blue-600">${a.jabatan}</span></p>
                         </div>
-                        <div class="flex items-center gap-2">
-                            <span class="text-[10px] ${badgeColor} px-2 py-0.5 rounded-full font-semibold">${a.jabatan}</span>
-                            ${deleteButton}
-                        </div>
+                        <span class="text-[10px] ${badgeColor} px-2 py-0.5 rounded-full font-semibold">${a.jabatan}</span>
                     </div>
                 `;
             });
             document.getElementById('listAnggota').innerHTML = htmlAnggota || '<p class="text-slate-400 text-center py-2">Belum ada anggota</p>';
 
+            // Render Kas
             let htmlMutasi = "";
             let htmlKas = "";
             appData.kas.forEach(k => {
+                let jml = parseInt(k.jumlah) || 0;
                 let color = k.tipe === 'masuk' ? 'text-blue-600' : 'text-rose-600';
                 let sign = k.tipe === 'masuk' ? '+ ' : '- ';
                 let detailPembayar = k.pembayar && k.pembayar !== '-' ? `<span class="text-[10px] text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded">Dari: ${k.pembayar}</span>` : '';
-                let deleteKasBtn = isAdmin ? `<button onclick="hapusKas(${k.id})" class="text-rose-500 hover:text-rose-700 p-1 ml-2 transition" title="Hapus Transaksi"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>` : '';
                 
                 let itemHTML = `
                     <div class="py-2.5 space-y-1">
@@ -648,10 +642,7 @@
                                 <p class="font-medium text-slate-800">${k.ket}</p>
                                 <p class="text-[10px] text-slate-400">${k.tanggal} ${detailPembayar ? '• ' : ''} ${detailPembayar}</p>
                             </div>
-                            <div class="flex items-center">
-                                <span class="font-semibold ${color}">${sign}Rp ${k.jumlah.toLocaleString('id-ID')}</span>
-                                ${deleteKasBtn}
-                            </div>
+                            <span class="font-semibold ${color}">${sign}Rp ${jml.toLocaleString('id-ID')}</span>
                         </div>
                     </div>
                 `;
@@ -664,7 +655,8 @@
             lucide.createIcons();
         }
 
-        renderApp();
+        // Muat data saat halaman pertama kali dibuka
+        fetchAppData();
     </script>
 </body>
 </html>
