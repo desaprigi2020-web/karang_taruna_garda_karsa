@@ -368,7 +368,6 @@
             anggota: []
         };
 
-        // KUNCI UTAMA: Default dimulai dari false (Mode Warga)
         let isAdmin = false;
 
         const jabatanPrioritas = {
@@ -441,7 +440,6 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // Tombol Mode: Jika posisi Warga, buka modal PIN. Jika sudah Admin, keluar mode admin.
         function toggleAdminMode() {
             if (!isAdmin) {
                 document.getElementById('inputPinAkses').value = "";
@@ -722,7 +720,6 @@
             lucide.createIcons();
         }
 
-        // Inisialisasi awal saat halaman dibuka
         updateAdminUI();
         fetchAppData();
     </script>
