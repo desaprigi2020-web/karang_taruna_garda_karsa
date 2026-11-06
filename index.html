@@ -3,94 +3,141 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GARDA KARSA - Portal Pemuda & Warga</title>
+  <title>GARDA KARSA</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans pb-24">
 
-  <!-- Header / Navbar -->
-  <header class="bg-indigo-900 text-white p-4 shadow-md sticky top-0 z-40">
-    <div class="max-w-md mx-auto flex justify-between items-center">
-      <h1 class="font-bold text-lg tracking-wide">GARDA KARSA</h1>
-      <button onclick="bukaAdminModal()" class="text-xs bg-indigo-700 hover:bg-indigo-600 px-3 py-1.5 rounded-lg transition">
-        🔐 Admin
-      </button>
+  <!-- Header / Branding Asli -->
+  <header class="bg-indigo-600 text-white p-4 shadow-md sticky top-0 z-40">
+    <div class="max-w-md mx-auto">
+      <div class="flex justify-between items-center mb-1">
+        <span class="text-[10px] bg-indigo-700/80 px-2 py-0.5 rounded tracking-wider uppercase font-semibold">LARUIZ FINANCE BY ANGGRI ARDANI</span>
+        <span class="text-xs bg-indigo-800 px-2 py-0.5 rounded font-medium">🔐 Mode Admin (Aktif)</span>
+      </div>
+      <h1 class="font-bold text-xl tracking-wide">GARDA KARSA</h1>
+      <p class="text-xs text-indigo-100">Desa Prigi • Portal Warga & Pengurus</p>
     </div>
   </header>
 
-  <!-- Konten Utama (Berdasarkan Tab Aktif) -->
+  <!-- Konten Utama -->
   <main class="max-w-md mx-auto p-4 space-y-6">
     
-    <!-- TAB 1: ACARA & NOTULEN -->
-    <div id="tabAcara" class="space-y-4">
-      <div class="flex justify-between items-center">
-        <h2 class="font-bold text-gray-700 text-base">📅 Jadwal Acara & Notulen</h2>
+    <!-- Total Kas Organisasi -->
+    <div class="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-5 text-white shadow-md">
+      <p class="text-xs uppercase tracking-wider text-blue-100 font-medium">Total Kas Organisasi</p>
+      <h2 class="text-3xl font-extrabold mt-1">Rp 3.000</h2>
+      <div class="mt-4 pt-3 border-t border-white/20 flex justify-between text-xs text-blue-50">
+        <span>Masuk: Rp 4.000</span>
+        <span>Keluar: Rp 1.000</span>
       </div>
+    </div>
+
+    <!-- Menu Shortcut Ikon -->
+    <div class="grid grid-cols-4 gap-2 bg-white p-3 rounded-2xl shadow-sm border border-gray-100 text-center">
+      <button onclick="gantiTab('beranda')" class="flex flex-col items-center p-2 text-indigo-600">
+        <span class="text-xl">🏠</span>
+        <span class="text-[11px] font-medium mt-1">Beranda</span>
+      </button>
+      <button onclick="gantiTab('struktur')" class="flex flex-col items-center p-2 text-gray-500 hover:text-indigo-600">
+        <span class="text-xl">👥</span>
+        <span class="text-[11px] font-medium mt-1">Struktur</span>
+      </button>
+      <button onclick="gantiTab('kas')" class="flex flex-col items-center p-2 text-gray-500 hover:text-indigo-600">
+        <span class="text-xl">💳</span>
+        <span class="text-[11px] font-medium mt-1">Iuran/Kas</span>
+      </button>
+      <button onclick="gantiTab('setting')" class="flex flex-col items-center p-2 text-gray-500 hover:text-indigo-600">
+        <span class="text-xl">⚙️</span>
+        <span class="text-[11px] font-medium mt-1">Setting</span>
+      </button>
+    </div>
+
+    <!-- Agenda & Acara Mendatang -->
+    <section class="space-y-3">
+      <h3 class="font-bold text-gray-800 text-sm flex items-center gap-2">
+        <span>📅</span> Agenda & Acara Mendatang
+      </h3>
+      
+      <!-- Container Daftar Acara (Dimuat dari Google Sheets) -->
       <div id="listAcara" class="space-y-3">
-        <p class="text-sm text-gray-400 text-center py-4">Memuat data acara...</p>
+        <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+          <p class="text-xs text-gray-400 text-center">Memuat agenda...</p>
+        </div>
       </div>
-    </div>
+    </section>
 
-    <!-- TAB 2: ANGGOTA (Opsional jika ingin ditampilkan) -->
-    <div id="tabAnggota" class="space-y-4 hidden">
-      <div class="flex justify-between items-center">
-        <h2 class="font-bold text-gray-700 text-base">👥 Data Anggota Karang Taruna</h2>
+    <!-- Mutasi Kas Terbaru -->
+    <section class="space-y-3">
+      <h3 class="font-bold text-gray-800 text-sm flex items-center gap-2">
+        <span>⏱️</span> Mutasi Kas Terbaru
+      </h3>
+      <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 space-y-3">
+        <div class="flex justify-between items-center text-sm border-b pb-2">
+          <div>
+            <p class="font-semibold text-gray-800">Iuran pertemuan rutin bulan November</p>
+            <p class="text-[11px] text-gray-400">2026-11-06T17:00:00.000Z • Dari: ELY SADA</p>
+          </div>
+          <span class="font-bold text-emerald-600">+ Rp 2.000</span>
+        </div>
+        <div class="flex justify-between items-center text-sm">
+          <div>
+            <p class="font-semibold text-gray-800">Iuran november</p>
+            <p class="text-[11px] text-gray-400">2026-11-06T17:00:00.000Z</p>
+          </div>
+          <span class="font-bold text-emerald-600">+ Rp 2.000</span>
+        </div>
       </div>
-      <div id="listAnggota" class="space-y-2">
-        <p class="text-sm text-gray-400 text-center py-4">Memuat data anggota...</p>
-      </div>
-    </div>
-
-    <!-- TAB 3: KAS (Opsional jika ingin ditampilkan) -->
-    <div id="tabKas" class="space-y-4 hidden">
-      <div class="flex justify-between items-center">
-        <h2 class="font-bold text-gray-700 text-base">💰 Keuangan & Kas</h2>
-      </div>
-      <div id="listKas" class="space-y-2">
-        <p class="text-sm text-gray-400 text-center py-4">Memuat data kas...</p>
-      </div>
-    </div>
+    </section>
 
   </main>
 
-  <!-- Navigasi Bawah (Bottom Navigation Bar) -->
+  <!-- Bottom Navigation Bar Asli -->
   <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-2 px-4 shadow-lg z-40">
     <div class="max-w-md mx-auto flex justify-around">
-      <button onclick="gantiTab('acara')" id="navAcara" class="flex flex-col items-center text-indigo-600 text-xs font-medium">
-        <span class="text-xl">📅</span>
-        <span>Acara</span>
+      <button class="flex flex-col items-center text-indigo-600 text-xs font-medium">
+        <span class="text-xl">🏠</span>
+        <span>Beranda</span>
       </button>
-      <button onclick="gantiTab('anggota')" id="navAnggota" class="flex flex-col items-center text-gray-400 text-xs font-medium">
+      <button class="flex flex-col items-center text-gray-400 text-xs font-medium">
         <span class="text-xl">👥</span>
-        <span>Anggota</span>
+        <span>Struktur</span>
       </button>
-      <button onclick="gantiTab('kas')" id="navKas" class="flex flex-col items-center text-gray-400 text-xs font-medium">
-        <span class="text-xl">💰</span>
+      <button class="flex flex-col items-center text-gray-400 text-xs font-medium">
+        <span class="text-xl">💳</span>
         <span>Kas</span>
+      </button>
+      <button class="flex flex-col items-center text-gray-400 text-xs font-medium">
+        <span class="text-xl">⚙️</span>
+        <span>Setting</span>
       </button>
     </div>
   </nav>
 
-  <!-- ================= MODAL DETAIL ACARA & NOTULEN ================= -->
+  <!-- ================= MODAL POP-UP DETAIL ACARA & NOTULEN ================= -->
   <div id="modalAcara" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
     <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-xl relative max-h-[90vh] overflow-y-auto">
       
+      <!-- Tombol Tutup -->
       <button onclick="tutupModalAcara()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 font-bold text-xl">
         &times;
       </button>
 
+      <!-- Judul & Tanggal -->
       <h3 id="modalJudul" class="text-xl font-bold text-indigo-900 pr-6"></h3>
       <div class="flex items-center gap-4 text-sm text-gray-500 mt-2 mb-4 border-b pb-3">
         <span>📅 <span id="modalTanggal"></span></span>
         <span>📍 <span id="modalLokasi"></span></span>
       </div>
 
+      <!-- Deskripsi Acara -->
       <div class="mb-5">
         <h4 class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1">Deskripsi Kegiatan</h4>
         <p id="modalDeskripsi" class="text-gray-700 text-sm leading-relaxed whitespace-pre-line"></p>
       </div>
 
+      <!-- Bagian Notulen Rapat -->
       <div class="bg-indigo-50/60 rounded-xl p-4 border border-indigo-100">
         <div class="flex items-center gap-2 mb-2">
           <span class="text-indigo-600 font-bold">📝 Notulen Rapat & Hasil Keputusan</span>
@@ -103,83 +150,11 @@
     </div>
   </div>
 
-  <!-- ================= MODAL ADMIN: TAMBAH ACARA ================= -->
-  <div id="modalAdmin" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
-    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl relative">
-      <h3 class="text-lg font-bold text-indigo-900 mb-4">Panel Admin: Tambah Acara</h3>
-      
-      <div class="space-y-3">
-        <div>
-          <label class="block text-xs font-semibold text-gray-600 mb-1">Nama Acara</label>
-          <input type="text" id="inputNamaAcara" class="w-full border rounded-lg p-2 text-sm" placeholder="Contoh: Rapat Pleno Bulanan">
-        </div>
-        <div>
-          <label class="block text-xs font-semibold text-gray-600 mb-1">Tanggal</label>
-          <input type="date" id="inputTanggalAcara" class="w-full border rounded-lg p-2 text-sm">
-        </div>
-        <div>
-          <label class="block text-xs font-semibold text-gray-600 mb-1">Lokasi</label>
-          <input type="text" id="inputLokasiAcara" class="w-full border rounded-lg p-2 text-sm" placeholder="Contoh: Balai Desa Prigi">
-        </div>
-        <div>
-          <label class="block text-xs font-semibold text-gray-600 mb-1">Deskripsi Lengkap</label>
-          <textarea id="inputDeskripsiAcara" rows="2" class="w-full border rounded-lg p-2 text-sm" placeholder="Rincian kegiatan..."></textarea>
-        </div>
-        <div>
-          <label class="block text-xs font-semibold text-gray-600 mb-1">Notulen Rapat / Hasil (Opsional)</label>
-          <textarea id="inputNotulenAcara" rows="3" class="w-full border rounded-lg p-2 text-sm" placeholder="Tuliskan hasil keputusan rapat di sini..."></textarea>
-        </div>
-      </div>
-
-      <div class="flex justify-end gap-2 mt-5">
-        <button onclick="tutupAdminModal()" class="px-4 py-2 text-sm text-gray-600 bg-gray-100 rounded-lg">Batal</button>
-        <button onclick="simpanAcara()" class="px-4 py-2 text-sm text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg font-medium">Simpan</button>
-      </div>
-    </div>
-  </div>
-
   <!-- ================= JAVASCRIPT LOGIC ================= -->
   <script>
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxartaShYX1bZZW1-V6i_Wx7CR8BKzfwbwZ6ws4pWTOEY_MLbc4QGG40SJ1aJhv_r0hGg/exec";
 
-    // Navigasi Tab Bawah
-    function gantiTab(tab) {
-      document.getElementById('tabAcara').classList.add('hidden');
-      document.getElementById('tabAnggota').classList.add('hidden');
-      document.getElementById('tabKas').classList.add('hidden');
-
-      document.getElementById('navAcara').className = "flex flex-col items-center text-gray-400 text-xs font-medium";
-      document.getElementById('navAnggota').className = "flex flex-col items-center text-gray-400 text-xs font-medium";
-      document.getElementById('navKas').className = "flex flex-col items-center text-gray-400 text-xs font-medium";
-
-      if (tab === 'acara') {
-        document.getElementById('tabAcara').classList.remove('hidden');
-        document.getElementById('navAcara').className = "flex flex-col items-center text-indigo-600 text-xs font-medium";
-        muatDataAcara();
-      } else if (tab === 'anggota') {
-        document.getElementById('tabAnggota').classList.remove('hidden');
-        document.getElementById('navAnggota').className = "flex flex-col items-center text-indigo-600 text-xs font-medium";
-        muatDataAnggota();
-      } else if (tab === 'kas') {
-        document.getElementById('tabKas').classList.remove('hidden');
-        document.getElementById('navKas').className = "flex flex-col items-center text-indigo-600 text-xs font-medium";
-        muatDataKas();
-      }
-    }
-
-    // Format Tanggal agar rapi dibaca
-    function formatTanggal(tglStr) {
-      if (!tglStr) return '-';
-      try {
-        const d = new Date(tglStr);
-        if (isNaN(d.getTime())) return tglStr; // Jika format teks biasa
-        return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
-      } catch (e) {
-        return tglStr;
-      }
-    }
-
-    // Memuat Data Acara
+    // Memuat Data Acara dan Notulen dari Google Sheets
     function muatDataAcara() {
       fetch(WEB_APP_URL + '?action=getAcara')
         .then(res => res.json())
@@ -188,53 +163,40 @@
           container.innerHTML = '';
           
           if (!data || data.length === 0) {
-            container.innerHTML = '<p class="text-sm text-gray-400 text-center py-4">Belum ada jadwal acara.</p>';
+            container.innerHTML = '<div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 text-center text-xs text-gray-400">Belum ada agenda acara.</div>';
             return;
           }
 
           data.forEach(item => {
             const nama = (item.nama_acara || '').replace(/'/g, "\\'");
-            const tglFormatted = formatTanggal(item.tanggal);
-            const tglRaw = (item.tanggal || '').replace(/'/g, "\\'");
+            const tgl = (item.tanggal || '').replace(/'/g, "\\'");
             const lok = (item.lokasi || '').replace(/'/g, "\\'");
             const desc = (item.deskripsi_lengkap || '').replace(/'/g, "\\'").replace(/\n/g, '\\n');
             const notul = (item.notulen || '').replace(/'/g, "\\'").replace(/\n/g, '\\n');
 
             container.innerHTML += `
-              <div onclick="bukaDetailAcara('${nama}', '${tglFormatted}', '${lok}', '${desc}', '${notul}')" 
-                   class="cursor-pointer p-4 bg-white rounded-xl shadow-sm hover:shadow-md border border-gray-100 transition">
-                <h4 class="font-bold text-gray-800">${item.nama_acara}</h4>
-                <p class="text-xs text-gray-500 mt-1">📅 ${tglFormatted} | 📍 ${item.lokasi}</p>
-                <div class="mt-2 flex items-center justify-between">
-                  <span class="text-xs text-indigo-600 font-medium">Ketuk untuk lihat detail & notulen →</span>
+              <div onclick="bukaDetailAcara('${nama}', '${tgl}', '${lok}', '${desc}', '${notul}')" 
+                   class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 cursor-pointer hover:border-indigo-200 transition">
+                <div class="flex justify-between items-start">
+                  <h4 class="font-bold text-gray-800 text-sm">${item.nama_acara}</h4>
                   ${item.notulen ? '<span class="text-[10px] bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-semibold">📝 Ada Notulen</span>' : ''}
                 </div>
+                <p class="text-xs text-gray-400 mt-1">🕒 ${item.tanggal}</p>
+                <p class="text-xs text-gray-500 mt-2 flex items-center gap-1">📍 ${item.lokasi || 'Balai Desa Prigi'}</p>
               </div>
             `;
           });
         })
         .catch(err => {
-          console.error('Gagal memuat acara:', err);
-          document.getElementById('listAcara').innerHTML = '<p class="text-sm text-red-400 text-center py-4">Gagal memuat data acara.</p>';
+          console.error('Gagal memuat data:', err);
         });
     }
 
-    // Fungsi placeholder untuk Anggota & Kas (Sesuaikan dengan fungsi Anda sebelumnya jika ada)
-    function muatDataAnggota() {
-      // Jika Anda memiliki action getAnggota di GAS, fetch datanya di sini
-      document.getElementById('listAnggota').innerHTML = '<p class="text-sm text-gray-500 text-center py-4">Modul Data Anggota siap dihubungkan.</p>';
-    }
-
-    function muatDataKas() {
-      // Jika Anda memiliki action getKas di GAS, fetch datanya di sini
-      document.getElementById('listKas').innerHTML = '<p class="text-sm text-gray-500 text-center py-4">Modul Keuangan Kas siap dihubungkan.</p>';
-    }
-
-    // Fungsi Modal Detail Acara
+    // Fungsi Membuka Modal Detail Acara & Notulen
     function bukaDetailAcara(nama, tanggal, lokasi, deskripsi, notulen) {
       document.getElementById('modalJudul').innerText = nama;
       document.getElementById('modalTanggal').innerText = tanggal;
-      document.getElementById('modalLokasi').innerText = lokasi;
+      document.getElementById('modalLokasi').innerText = lokasi || 'Balai Desa Prigi';
       document.getElementById('modalDeskripsi').innerText = deskripsi && deskripsi !== 'undefined' ? deskripsi : 'Tidak ada deskripsi tambahan.';
       
       const containerNotulen = document.getElementById('modalNotulen');
@@ -255,46 +217,8 @@
       modal.classList.add('hidden');
     }
 
-    // Panel Admin
-    function bukaAdminModal() {
-      document.getElementById('modalAdmin').classList.remove('hidden');
-      document.getElementById('modalAdmin').classList.add('flex');
-    }
-
-    function tutupAdminModal() {
-      document.getElementById('modalAdmin').classList.remove('flex');
-      document.getElementById('modalAdmin').classList.add('hidden');
-    }
-
-    function simpanAcara() {
-      const data = {
-        id: Date.now().toString(),
-        nama_acara: document.getElementById('inputNamaAcara').value,
-        tanggal: document.getElementById('inputTanggalAcara').value,
-        lokasi: document.getElementById('inputLokasiAcara').value,
-        deskripsi_lengkap: document.getElementById('inputDeskripsiAcara').value,
-        notulen: document.getElementById('inputNotulenAcara').value
-      };
-
-      if(!data.nama_acara || !data.tanggal) {
-        alert('Nama acara dan tanggal wajib diisi!');
-        return;
-      }
-
-      fetch(WEB_APP_URL + '?action=addAcara', {
-        method: 'POST',
-        body: JSON.stringify(data)
-      })
-      .then(res => res.text())
-      .then(response => {
-        alert('Acara & Notulen berhasil disimpan!');
-        tutupAdminModal();
-        muatDataAcara();
-      })
-      .catch(err => {
-        alert('Gagal menyimpan data.');
-        console.error(err);
-      });
+    function gantiTab(tab) {
+      // Fungsi navigasi tab jika diperlukan
     }
 
     window.onload = function() {
