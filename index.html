@@ -744,14 +744,6 @@
 
         updateAdminUI();
         fetchAppData();
-<script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js')
-        .then((reg) => console.log('Service Worker berhasil didaftarkan!', reg))
-        .catch((err) => console.log('Gagal mendaftarkan Service Worker:', err));
-    });
-  }
-</script>
+    </script>
 </body>
 </html>
