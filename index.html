@@ -30,7 +30,7 @@
                 </button>
             </div>
             <div>
-                <h1 id="headerNamaOrg" class="font-bold text-lg leading-tight tracking-tight">Karang Taruna</h1>
+                <h1 id="headerNamaOrg" class="font-bold text-lg leading-tight tracking-tight">GARDA KARSA</h1>
                 <p id="headerSubOrg" class="text-xs text-blue-100 font-medium">Desa Prigi • Portal Resmi</p>
             </div>
         </div>
@@ -303,8 +303,8 @@
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxartaShYX1bZZW1-V6i_Wx7CR8BKzfwbwZ6ws4pWTOEY_MLbc4QGG40SJ1aJhv_r0hGg/exec";
 
         let appData = {
-            orgName: "Karang Taruna",
-            orgSub: "Desa Prigi • Portal Warga & Pengurus",
+            orgName: localStorage.getItem('laruiz_orgName') || "GARDA KARSA",
+            orgSub: localStorage.getItem('laruiz_orgSub') || "Desa Prigi • Portal Warga & Pengurus",
             adminPin: "1234",
             acara: [],
             kas: [],
@@ -349,7 +349,6 @@
             }
         }
 
-        // Fungsi Hapus Data dengan Mode Standar POST agar merespons dengan baik
         async function hapusDataSheet(sheetName, idValue) {
             if (!confirm("Yakin ingin menghapus data ini?")) return;
             try {
@@ -445,6 +444,7 @@
 
         function bukaModalAcara() { document.getElementById('modalAcara').classList.remove('hidden'); }
         function tutupModalAcara() { document.getElementById('modalAcara').classList.add('hidden'); }
+        
         function simpanAcaraBaru() {
             let nama = document.getElementById('acaraNama').value.trim();
             let waktu = document.getElementById('acaraWaktu').value.trim();
@@ -502,8 +502,12 @@
             if(namaBaru) {
                 appData.orgName = namaBaru;
                 appData.orgSub = subBaru || "Portal Resmi Warga";
+                
+                localStorage.setItem('laruiz_orgName', appData.orgName);
+                localStorage.setItem('laruiz_orgSub', appData.orgSub);
+
                 renderApp();
-                alert("Pengaturan organisasi diperbarui!");
+                alert("Pengaturan organisasi berhasil disimpan secara permanen!");
             } else { alert("Nama organisasi tidak boleh kosong!"); }
         }
 
@@ -537,12 +541,11 @@
 
             appData.anggota.sort((a, b) => (jabatanPrioritas[a.jabatan] || 8) - (jabatanPrioritas[b.jabatan] || 8));
 
-            // Render Acara
             let htmlAcaraWarga = "", htmlAdminAcara = "";
             if(appData.acara && appData.acara.length > 0) {
                 appData.acara.forEach(ac => {
                     let btnHapusAcara = isAdmin ? `<button onclick="hapusDataSheet('Acara', '${ac.id}')" class="text-rose-500 hover:text-rose-700 p-1"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : '';
-                    htmlAcaraWarga += `
+                    let itemAcaraHTML = `
                         <div class="p-3 bg-blue-50/60 rounded-xl border-l-4 border-blue-600 flex justify-between items-center">
                             <div class="space-y-1">
                                 <p class="font-bold text-slate-800">${ac.nama}</p>
@@ -552,13 +555,16 @@
                             ${btnHapusAcara}
                         </div>
                     `;
+                    htmlAcaraWarga += itemAcaraHTML;
+                    htmlAdminAcara += itemAcaraHTML;
                 });
             } else {
                 htmlAcaraWarga = '<p class="text-slate-400 text-center py-2">Belum ada agenda acara mendatang.</p>';
+                htmlAdminAcara = '<p class="text-slate-400 text-center py-2">Belum ada agenda acara.</p>';
             }
             document.getElementById('listAcaraWarga').innerHTML = htmlAcaraWarga;
+            document.getElementById('listAdminAcara').innerHTML = htmlAdminAcara;
 
-            // Render Anggota
             let htmlAnggota = "";
             appData.anggota.forEach(a => {
                 let badgeColor = a.jabatan === 'Ketua' ? 'bg-amber-100 text-amber-800' : 'bg-blue-100 text-blue-800';
@@ -579,7 +585,6 @@
             });
             document.getElementById('listAnggota').innerHTML = htmlAnggota || '<p class="text-slate-400 text-center py-2">Belum ada anggota</p>';
 
-            // Render Kas & Mutasi
             let htmlMutasi = "", htmlKas = "";
             appData.kas.forEach(k => {
                 let jml = parseInt(k.jumlah) || 0;
