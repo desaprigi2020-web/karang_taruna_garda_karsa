@@ -188,6 +188,21 @@
         </div>
     </main>
 
+    <!-- MODAL PIN ADMIN (DI-SENSOR) -->
+    <div id="modalPin" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl w-full max-w-sm p-5 space-y-3 shadow-xl">
+            <h3 class="font-bold text-sm text-slate-800">Autentikasi Pengurus</h3>
+            <p class="text-[11px] text-slate-500">Masukkan PIN Admin untuk masuk:</p>
+            <div>
+                <input type="password" id="inputPinAkses" class="w-full text-xs p-2.5 border rounded-lg focus:outline-blue-600 tracking-widest text-center text-base" placeholder="••••••••">
+            </div>
+            <div class="flex gap-2 pt-2">
+                <button onclick="tutupModalPin()" class="flex-1 bg-slate-200 text-slate-700 py-2 rounded-lg text-xs font-semibold">Batal</button>
+                <button onclick="verifikasiPinAdmin()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg text-xs font-semibold transition">Masuk</button>
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL TAMBAH ANGGOTA -->
     <div id="modalAnggota" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl w-full max-w-sm p-5 space-y-3 shadow-xl">
@@ -305,7 +320,7 @@
         let appData = {
             orgName: localStorage.getItem('laruiz_orgName') || "GARDA KARSA",
             orgSub: localStorage.getItem('laruiz_orgSub') || "Desa Prigi • Portal Warga & Pengurus",
-            adminPin: "1234",
+            adminPin: localStorage.getItem('laruiz_adminPin') || "567890",
             acara: [],
             kas: [],
             anggota: []
@@ -383,21 +398,35 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
+        // Mode Admin menggunakan Modal dengan input disensor (password)
         function toggleAdminMode() {
             if (!isAdmin) {
-                let pin = prompt("Masukkan PIN Pengurus:");
-                if (pin === (appData.adminPin || "1234")) {
-                    isAdmin = true;
-                    alert("Berhasil masuk sebagai Pengurus!");
-                } else if(pin !== null) {
-                    alert("PIN Salah!");
-                    return;
-                } else {
-                    return;
-                }
+                document.getElementById('inputPinAkses').value = "";
+                document.getElementById('modalPin').classList.remove('hidden');
+                document.getElementById('inputPinAkses').focus();
             } else {
                 isAdmin = false;
                 alert("Keluar dari Mode Admin.");
+                updateAdminUI();
+                renderApp();
+            }
+        }
+
+        function tutupModalPin() {
+            document.getElementById('modalPin').classList.add('hidden');
+        }
+
+        function verifikasiPinAdmin() {
+            let pinInput = document.getElementById('inputPinAkses').value.trim();
+            let currentPin = appData.adminPin || "567890";
+            
+            if (pinInput === currentPin) {
+                isAdmin = true;
+                tutupModalPin();
+                alert("Berhasil masuk sebagai Pengurus!");
+            } else {
+                alert("PIN Salah!");
+                document.getElementById('inputPinAkses').value = "";
             }
             updateAdminUI();
             renderApp();
@@ -513,11 +542,12 @@
 
         function gantiPinAdmin() {
             let pinBaru = document.getElementById('inputPinBaru').value.trim();
-            if(pinBaru.length >= 3) {
+            if(pinBaru.length >= 4) {
                 appData.adminPin = pinBaru;
+                localStorage.setItem('laruiz_adminPin', appData.adminPin);
                 document.getElementById('inputPinBaru').value = "";
-                alert("PIN Admin berhasil diubah!");
-            } else { alert("PIN minimal harus 3 karakter/angka!"); }
+                alert("PIN Admin berhasil diubah dan disimpan secara permanen!");
+            } else { alert("PIN minimal harus 4 karakter/angka!"); }
         }
 
         function renderApp() {
