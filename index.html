@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title id="pageTitle">Laruiz Finance - Karang Taruna Portal</title>
-    <link rel="manifest" href="manifest.json">
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts: Plus Jakarta Sans -->
@@ -745,6 +744,14 @@
 
         updateAdminUI();
         fetchAppData();
-    </script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js')
+        .then((reg) => console.log('Service Worker berhasil didaftarkan!', reg))
+        .catch((err) => console.log('Gagal mendaftarkan Service Worker:', err));
+    });
+  }
+</script>
 </body>
 </html>
