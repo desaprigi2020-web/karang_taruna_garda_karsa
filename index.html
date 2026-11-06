@@ -374,6 +374,26 @@
             "Ketua": 1, "Wakil Ketua": 2, "Sekretaris": 3, "Bendahara": 4, "Seksi-Seksi": 5, "Anggota": 6, "Lain-lain": 7
         };
 
+        // Fungsi Format Tanggal ke Bahasa Indonesia secara rapi
+        function formatTanggalIndo(tglStr) {
+            if (!tglStr || tglStr.trim() === '') return '-';
+            if (isNaN(Date.parse(tglStr)) && !tglStr.includes('-') && !tglStr.includes('/')) {
+                return tglStr;
+            }
+            try {
+                let d = new Date(tglStr);
+                if (isNaN(d.getTime())) return tglStr;
+                return d.toLocaleDateString('id-ID', { 
+                    weekday: 'long', 
+                    day: 'numeric', 
+                    month: 'long', 
+                    year: 'numeric' 
+                });
+            } catch (e) {
+                return tglStr;
+            }
+        }
+
         async function fetchAppData() {
             try {
                 let response = await fetch(SCRIPT_URL + "?action=getData");
@@ -544,7 +564,7 @@
             if(!ac) return;
 
             document.getElementById('detailAcaraNama').innerText = ac.nama || ac.nama_acara || '';
-            document.getElementById('detailAcaraWaktu').innerText = ac.waktu || ac.tanggal || '-';
+            document.getElementById('detailAcaraWaktu').innerText = formatTanggalIndo(ac.waktu || ac.tanggal);
             document.getElementById('detailAcaraTempat').innerText = ac.tempat || ac.lokasi || 'Balai Desa Prigi';
             document.getElementById('detailAcaraDesc').innerText = ac.desc || ac.deskripsi_lengkap || 'Tidak ada deskripsi tambahan.';
             
@@ -648,6 +668,7 @@
             let htmlAcaraWarga = "", htmlAdminAcara = "";
             if(appData.acara && appData.acara.length > 0) {
                 appData.acara.forEach((ac, idx) => {
+                    let tglTampil = formatTanggalIndo(ac.waktu || ac.tanggal);
                     let btnHapusAcara = isAdmin ? `<button onclick="event.stopPropagation(); hapusDataSheet('Acara', '${ac.id}')" class="text-rose-500 hover:text-rose-700 p-1"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : '';
                     let badgeNotul = (ac.notulen && ac.notulen.trim() !== '') ? '<span class="text-[9px] bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded font-semibold ml-2">📝 Ada Notulen</span>' : '';
                     
@@ -655,8 +676,8 @@
                         <div onclick="bukaModalDetailAcara(${idx})" class="p-3 bg-blue-50/60 hover:bg-blue-100/70 rounded-xl border-l-4 border-blue-600 flex justify-between items-center cursor-pointer transition">
                             <div class="space-y-1">
                                 <p class="font-bold text-slate-800 flex items-center">${ac.nama || ac.nama_acara}${badgeNotul}</p>
-                                <p class="text-[11px] text-slate-600">🕒 ${ac.waktu || ac.tanggal}</p>
-                                <p class="text-[11px] text-slate-600">📍 ${ac.tempat || ac.lokasi}</p>
+                                <p class="text-[11px] text-slate-600">🕒 ${tglTampil}</p>
+                                <p class="text-[11px] text-slate-600">📍 ${ac.tempat || ac.lokasi || 'Balai Desa Prigi'}</p>
                                 <p class="text-[10px] text-blue-600 font-medium pt-0.5">Ketuk untuk lihat notulen & detail →</p>
                             </div>
                             ${btnHapusAcara}
@@ -697,13 +718,14 @@
                 let jml = parseInt(k.jumlah) || 0;
                 let color = k.tipe === 'masuk' ? 'text-blue-600' : 'text-rose-600';
                 let sign = k.tipe === 'masuk' ? '+ ' : '- ';
+                let tglKasRapi = formatTanggalIndo(k.tanggal);
                 let btnHapusKas = isAdmin ? `<button onclick="hapusDataSheet('Kas', '${k.id}')" class="text-rose-500 hover:text-rose-700 p-1"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>` : '';
                 
                 let itemHTML = `
                     <div class="py-2.5 space-y-1 flex justify-between items-center">
                         <div>
                             <p class="font-medium text-slate-800">${k.ket}</p>
-                            <p class="text-[10px] text-slate-400">${k.tanggal} ${k.pembayar && k.pembayar !== '-' ? '• Dari: ' + k.pembayar : ''}</p>
+                            <p class="text-[10px] text-slate-400">${tglKasRapi} ${k.pembayar && k.pembayar !== '-' ? '• Dari: ' + k.pembayar : ''}</p>
                         </div>
                         <div class="flex items-center gap-3">
                             <span class="font-semibold ${color}">${sign}Rp ${jml.toLocaleString('id-ID')}</span>
