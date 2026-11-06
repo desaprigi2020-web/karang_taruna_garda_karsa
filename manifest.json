@@ -1,0 +1,13 @@
+{
+  "background_color": "#79892f",
+  "dir": "ltr",
+  "display": "standalone",
+  "name": "GARDA KARSA",
+  "orientation": "any",
+  "scope": "/",
+  "short_name": "Garda Karsa",
+  "start_url": "/",
+  "theme_color": "#1a4682",
+  "id": "/karang_taruna_garda_karsa/",
+  "description": "Portal Resmi Warga &amp; Pengurus Karang Taruna Desa Prigi - Pencatatan Kas, Agenda, dan Notulen Rapat."
+}
